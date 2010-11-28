@@ -40,6 +40,7 @@ class Spotread(object):
     """Wrapper for the ArgyllCMS spotread command, which allows reading of
     values from various monitor probes.
     """
+
     def __init__(self, cmd = "spotread", port = 1, lcd = False, crt = False):
         if not (lcd or crt) and not (lcd and crt):
             raise ValueError("Either lcd or crt must be True")
@@ -53,6 +54,8 @@ class Spotread(object):
         self.proc = pexpect.spawn(self.cmd)
 
     def sample(self):
+        """Read a colour sample from the probe
+        """
         self.proc.expect(".*any other key to take a reading:")
         self.proc.send(" ")
         self.proc.expect("Result is XYZ: (\d+\.\d+) (\d+\.\d+) (\d+\.\d+),")
@@ -60,9 +63,11 @@ class Spotread(object):
         return XYZ(X, Y, Z)
 
     def quit(self):
+        """Exit the spotread command nicely
+        """
         self.proc.expect(".*any other key to take a reading:")
         self.proc.send("q")
-        self.proc.send("q")
+        self.proc.send("q") # confirm quit
 
 
 if __name__ == '__main__':
