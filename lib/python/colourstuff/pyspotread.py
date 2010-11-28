@@ -2,7 +2,7 @@
 
 Primarily an interface to ArgyllCMS's spotread command, using pexpect.
 
-Requires http://www.argyllcms.com/
+Requires http://www.argyllcms.com (was developed with version 1.3.2)
 """
 
 import os
