@@ -14,6 +14,19 @@ import pexpect
 from colour_temp import correlated_colour_temp
 
 
+class ColourMatrix(object):
+    def __init__(self, *args):
+        if len(args) != 9:
+            raise ValueError("SHould have 9 args, have %s" % len(args))
+        self.matrix = args
+
+    def transform(self, r, g, b):
+        new_r = r*self.matrix[0] + g*self.matrix[1] + b*self.matrix[2]
+        new_g = r*self.matrix[3] + g*self.matrix[4] + b*self.matrix[5]
+        new_b = r*self.matrix[6] + g*self.matrix[7] + b*self.matrix[8]
+        return (new_r, new_g, new_b)
+
+
 class XYZ(object):
     def __init__(self, X, Y, Z):
         self.X = X
@@ -34,6 +47,29 @@ class XYZ(object):
 
     def cct(self):
         return correlated_colour_temp(self.X, self.Y, self.Z)
+
+    def to_srgb(self, space = "sRGB"):
+        #FIXME: This method is probably not correct
+        X, Y, Z = self.X, self.Y, self.Z
+
+        #Normalise XYZ values to 0-1, based on max XYZ value. Not correct
+        maxval = max(X, Y, Z)
+        X = X/maxval
+        Y = Y/maxval
+        Z = Z/maxval
+
+        lin_to_srgb = lambda v: (v * (v<=0.0031308)) + (((1.055 * v**1/2.4) - 0.055) * (v>0.0031308))
+
+        m = ColourMatrix(
+            3.2404542, -1.5371385, -0.4985314,
+            -0.9692660, 1.8760108, 0.0415560,
+            0.0556434, -0.2040259, 1.0572252)
+
+        r, g, b = m.transform(X, Y, Z)
+
+        sr, sg, sb = lin_to_srgb(r), lin_to_srgb(g), lin_to_srgb(b)
+
+        return (sr, sg, sb)
 
 
 class Spotread(object):
@@ -76,9 +112,11 @@ if __name__ == '__main__':
         port = 1,
         lcd = True)
 
+    # Grab one sample from the probe, and quit the process
     sample = sr.sample()
     sr.quit()
 
+    # Convert the XYZ to xyY and a colour-temp
     X, Y, Z = sample.X, sample.Y, sample.Z
     x, y, _ = sample.to_xyY()
     cct = sample.cct()
@@ -89,3 +127,4 @@ if __name__ == '__main__':
     print "X, Y, Z : %s, %s, %s" % tuple(format_float(a) for a in (X, Y, Z))
     print "x, y, Y : %s, %s, %s" % tuple(format_float(a) for a in (x, y, Y))
     print "CCT (K) : %s" % cct
+    print "sRGB    : %s, %s, %s" % tuple(format_float(a) for a in sample.to_srgb())
