@@ -128,7 +128,7 @@ class Spotread(object):
 
 if __name__ == '__main__':
     sr = Spotread(
-        cmd = os.path.expanduser("~/Applications/Media/Argyll_V1.3.2/bin/spotread"),
+        cmd = os.path.expanduser("~/Desktop/Argyll_V1.1.1/bin/spotread"),
         port = 1,
         lcd = True)
 
