@@ -6,8 +6,6 @@ Requires http://www.argyllcms.com (was developed with version 1.3.2)
 """
 
 import os
-import sys
-import math
 
 import pexpect
 
