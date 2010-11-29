@@ -104,6 +104,8 @@ class Spotread(object):
         elif crt:
             display_type = "c"
 
+        self.port = port
+
         self.cmd = "%s -y %s -c %s" % (cmd, display_type, port)
         self.proc = pexpect.spawn(self.cmd)
 
@@ -112,7 +114,7 @@ class Spotread(object):
         """
         self.proc.expect(".*any other key to take a reading:")
         self.proc.send(" ")
-        self.proc.expect("Result is XYZ: (\d+\.\d+) (\d+\.\d+) (\d+\.\d+),")
+        self.proc.expect("Result is XYZ: (-?\d+\.\d+) (-?\d+\.\d+) (-?\d+\.\d+),")
         X, Y, Z = [float(x) for x in self.proc.match.groups()]
         return XYZ(X, Y, Z)
 
