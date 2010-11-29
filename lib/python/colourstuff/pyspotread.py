@@ -69,6 +69,26 @@ class XYZ(object):
 
         return (sr, sg, sb)
 
+    def __str__(self):
+        def format_float(a):
+            return ("%.04f" % a).rjust(7)
+
+        X, Y, Z = self.X, self.Y, self.Z
+        x, y, _ = self.to_xyY()
+        cct = self.cct()
+        r, g, b = self.to_srgb()
+
+        out_text = ""
+        out_text += "X, Y, Z : %s, %s, %s" % tuple(format_float(a) for a in (X, Y, Z))
+        out_text += "\n"
+        out_text += "x, y, Y : %s, %s, %s" % tuple(format_float(a) for a in (x, y, Y))
+        out_text += "\n"
+        out_text += "CCT (K) : %s" % cct
+        out_text += "\n"
+        out_text += "sRGB    : %s, %s, %s" % tuple(format_float(a) for a in (r, g, b))
+
+        return out_text
+
 
 class Spotread(object):
     """Wrapper for the ArgyllCMS spotread command, which allows reading of
