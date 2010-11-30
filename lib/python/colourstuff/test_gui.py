@@ -16,8 +16,6 @@ class ClickableWidget(QtGui.QWidget):
         self.emit(QtCore.SIGNAL("clicked()"))
 
 
-locky = QtCore.QMutex()
-
 class SamplerThread(QtCore.QThread):
     def __init__(self,parent=None, sampler = None):
         QtCore.QThread.__init__(self,parent)
@@ -25,7 +23,6 @@ class SamplerThread(QtCore.QThread):
 
     def run(self):
         print "Getting lock"
-        # locky.lock()
         print "Commencing sample"
         try:
             XYZ = self.sampler.sample()
@@ -37,7 +34,6 @@ class SamplerThread(QtCore.QThread):
             X, Y, Z = XYZ.X, XYZ.Y, XYZ.Z
             self.emit(QtCore.SIGNAL("SampleOkay(int, float, float, float)"), self.sampler.port, X, Y, Z)
         finally:
-            # locky.unlock()
             print "release lock"
 
 
