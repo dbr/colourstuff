@@ -15,7 +15,7 @@ from colour_temp import correlated_colour_temp
 class ColourMatrix(object):
     def __init__(self, *args):
         if len(args) != 9:
-            raise ValueError("SHould have 9 args, have %s" % len(args))
+            raise ValueError("Should have 9 args, have %s" % len(args))
         self.matrix = args
 
     def transform(self, r, g, b):
