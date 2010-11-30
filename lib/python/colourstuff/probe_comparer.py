@@ -25,7 +25,9 @@ class SamplerThread(QtCore.QThread):
         try:
             XYZ = self.sampler.sample()
         except Exception, e:
-            self.emit(QtCore.SIGNAL("SampleError(int, str)"), self.sampler.port, str(e))
+            import traceback
+            estr = traceback.format_exc()
+            self.emit(QtCore.SIGNAL("SampleError(int, QString)"), self.sampler.port, estr)
         else:
             X, Y, Z = XYZ.X, XYZ.Y, XYZ.Z
             self.emit(QtCore.SIGNAL("SampleOkay(int, float, float, float)"), self.sampler.port, X, Y, Z)
