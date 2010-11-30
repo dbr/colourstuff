@@ -75,7 +75,10 @@ class XYZ(object):
 
         X, Y, Z = self.X, self.Y, self.Z
         x, y, _ = self.to_xyY()
-        cct = self.cct()
+        try:
+            cct = self.cct()
+        except ValueError, e:
+            cct = str(e)
         r, g, b = self.to_srgb()
 
         out_text = ""
