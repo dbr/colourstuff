@@ -22,19 +22,13 @@ class SamplerThread(QtCore.QThread):
         self.sampler = sampler
 
     def run(self):
-        print "Getting lock"
-        print "Commencing sample"
         try:
             XYZ = self.sampler.sample()
         except Exception, e:
-            print "Sample errored"
             self.emit(QtCore.SIGNAL("SampleError(int, str)"), self.sampler.port, str(e))
         else:
-            print "Sample done"
             X, Y, Z = XYZ.X, XYZ.Y, XYZ.Z
             self.emit(QtCore.SIGNAL("SampleOkay(int, float, float, float)"), self.sampler.port, X, Y, Z)
-        finally:
-            print "release lock"
 
 
 
