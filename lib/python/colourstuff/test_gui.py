@@ -135,17 +135,14 @@ class ProbeComparer(QtGui.QWidget):
         self.center()
 
         self.spotread1 = pyspotread.Spotread(
-            cmd = os.path.expanduser("~/Desktop/Argyll_V1.1.1/bin/spotread"),
             port = 1,
             lcd = True)
 
         self.spotread2 = pyspotread.Spotread(
-            cmd = os.path.expanduser("~/Desktop/Argyll_V1.1.1/bin/spotread"),
             port = 2,
             lcd = True)
 
         self.spotread3 = pyspotread.Spotread(
-            cmd = os.path.expanduser("~/Desktop/Argyll_V1.1.1/bin/spotread"),
             port = 3,
             lcd = True)
 

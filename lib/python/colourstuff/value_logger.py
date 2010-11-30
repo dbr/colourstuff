@@ -4,7 +4,6 @@ import datetime
 import pyspotread
 
 spotread = pyspotread.Spotread(
-    cmd = os.path.expanduser("~/Desktop/Argyll_V1.1.1/bin/spotread"),
     port = 1,
     lcd = True)
 
