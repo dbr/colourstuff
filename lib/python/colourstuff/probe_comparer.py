@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-# togglebutton.py
-
 import os
 import sys
 import signal
