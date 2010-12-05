@@ -169,10 +169,7 @@ class ProbeComparer(QtGui.QWidget):
                  2: self.info2,
                  3: self.info3}
 
-        try:
-            infostr = str(sample)
-        except ValueError, e:
-            infostr = str(e)
+        infostr = str(sample)
 
         mappy[patchnum].setText(infostr)
 
