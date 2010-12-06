@@ -53,6 +53,13 @@ class ColourMatrix(object):
         return (new_r, new_g, new_b)
 
 
+REFWHITES = {
+    # From http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_Lab.html
+    "D55": (0.95682, 1.00000, 0.92149),
+    "D65": (0.95047, 1.00000, 1.08883),
+}
+
+
 class XYZ(object):
     def __init__(self, X, Y, Z):
         self.X = X
@@ -73,6 +80,28 @@ class XYZ(object):
 
     def cct(self):
         return correlated_colour_temp(self.X, self.Y, self.Z)
+
+    def to_Lab(self, refwhite = "D65"):
+        """
+        http://en.wikipedia.org/wiki/L*a*b*
+        """
+        #FIXME: Not tested, probably not correct
+        def f(t):
+            if t > (6/29)**3:
+                return t**1/3
+            else:
+                return 1/3 * (29/6)**2 * t + 4/29
+
+        X, Y, Z = self.X, self.Y, self.Z
+
+        Xn, Yn, Zn = REFWHITES[refwhite]
+        Xn, Yn, Zn = [a*100 for a in (Xn, Yn, Zn)]
+
+        L = 116 * f(Y/Yn) - 16
+        a = 500 * (f(X/Xn) - (f(Y/Yn)))
+        b = 200 * (f(Y/Yn) - f(Z/Zn))
+
+        return (L, a, b)
 
     def to_srgb(self, space = "sRGB"):
         #FIXME: This method is probably not correct
