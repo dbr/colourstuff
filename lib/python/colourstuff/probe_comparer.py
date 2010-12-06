@@ -42,8 +42,12 @@ class ProbeComparer(QtGui.QWidget):
 
         self.setGeometry(500, 400, 800, 600)
 
+        self.number_probes = 2
+
+        self.probe_meta = {}
+
         all_patches = QtGui.QHBoxLayout()
-        for probenum in range(2):
+        for probenum in range(1, self.number_probes+1):
             patch = ClickableWidget(self)
             patch.setMinimumWidth(300)
             patch.setMinimumHeight(300)
@@ -62,6 +66,11 @@ class ProbeComparer(QtGui.QWidget):
             patch_col.addWidget(title)
             patch_col.addWidget(patch)
             patch_col.addWidget(info)
+
+            self.probe_meta[probenum] = {
+                'patch': patch,
+                'info': info,
+                'title': title}
 
             all_patches.addLayout(patch_col)
 
@@ -91,7 +100,6 @@ class ProbeComparer(QtGui.QWidget):
 
 
         patch_and_button_rows = QtGui.QVBoxLayout()
-
         patch_and_button_rows.addLayout(all_patches)
         patch_and_button_rows.addLayout(button_cols)
 
@@ -99,17 +107,17 @@ class ProbeComparer(QtGui.QWidget):
 
         self.center()
 
-        self.spotread1 = pyspotread.Spotread(
-            port = 1,
-            lcd = True)
+        probe_names = pyspotread.list_probes()
 
-        self.spotread2 = pyspotread.Spotread(
-            port = 2,
-            lcd = True)
+        self.probes = {}
+        for probenum in range(1, self.number_probes+1):
+            self.probes[probenum] = pyspotread.Spotread(
+                port = probenum,
+                lcd = True)
 
-        self.spotread3 = pyspotread.Spotread(
-            port = 3,
-            lcd = True)
+            name = probe_names[probenum]
+            self.probe_meta[probenum]['title'].setText(
+                "Probe %s (%s)" % (probenum, name))
 
         self.last_readings = {}
 
@@ -121,42 +129,22 @@ class ProbeComparer(QtGui.QWidget):
     def sampler_done(self, patchnum, X, Y, Z):
         print "Sample %s is done" % patchnum
         sample = pyspotread.XYZ(X, Y, Z)
-        mappy = {1: self.info1,
-                 2: self.info2,
-                 3: self.info3}
 
         infostr = str(sample)
 
-        mappy[patchnum].setText(infostr)
+        self.probe_meta[patchnum]['info'].setText(infostr)
 
         self.last_readings[patchnum] = sample
 
     def sampler_error(self, patchnum, errstr):
-        mappy = {1: self.info1,
-                 2: self.info2,
-                 3: self.info3}
-
-        mappy[patchnum].setText(errstr)
-
+        self.probe_meta[patchnum]['info'].setText(errstr)
 
     def do_sample(self):
-        if self.spotread1 is not None:
-            collector1 = SamplerThread(self, sampler = self.spotread1)
-            self.connect(collector1, QtCore.SIGNAL("SampleOkay(int, float, float, float)"), self.sampler_done)
-            self.connect(collector1, QtCore.SIGNAL("SampleError(int, QString)"), self.sampler_error)
-            collector1.start()
-
-        if self.spotread2 is not None:
-            collector2 = SamplerThread(self, sampler = self.spotread2)
-            self.connect(collector2, QtCore.SIGNAL("SampleOkay(int, float, float, float)"), self.sampler_done)
-            self.connect(collector2, QtCore.SIGNAL("SampleError(int, QString)"), self.sampler_error)
-            collector2.start()
-
-        if self.spotread3 is not None:
-            collector3 = SamplerThread(self, sampler = self.spotread3)
-            self.connect(collector3, QtCore.SIGNAL("SampleOkay(int, float, float, float)"), self.sampler_done)
-            self.connect(collector3, QtCore.SIGNAL("SampleError(int, QString)"), self.sampler_error)
-            collector3.start()
+        for probenum, spotread in self.probes.items():
+            collector = SamplerThread(self, sampler = spotread)
+            self.connect(collector, QtCore.SIGNAL("SampleOkay(int, float, float, float)"), self.sampler_done)
+            self.connect(collector, QtCore.SIGNAL("SampleError(int, QString)"), self.sampler_error)
+            collector.start()
 
     def set_reference(self, num):
         print "setting reference"
