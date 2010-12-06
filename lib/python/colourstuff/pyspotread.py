@@ -6,11 +6,35 @@ Requires http://www.argyllcms.com (was developed with version 1.3.2)
 """
 
 import os
+import re
 import subprocess
 
 import pexpect
 
 from colour_temp import correlated_colour_temp
+
+
+def list_probes(cmd = "spotread"):
+    """Parses the spotread command's help string which lists the connected probes
+    """
+    p = subprocess.Popen(cmd + " -h", shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    _, se = p.communicate()
+    in_listing = False
+    found = []
+    for line in se.splitlines():
+        if line.strip().startswith("-c listno"):
+            in_listing = True
+        elif line.strip().startswith("-t"):
+            in_listing = False
+        elif in_listing:
+            found.append(line.strip())
+
+    if len(found) == 1 and found[0] == "** No ports found **":
+        return []
+    else:
+        import re
+        return dict([re.match("(\d+) = '.*? \((.*)\)'", x).groups() for x in found])
+    return found
 
 
 class ColourMatrix(object):
@@ -94,30 +118,6 @@ class XYZ(object):
         return out_text
 
 
-def list_probes(cmd):
-    """Parses the spotread command's help string which lists the connected probes
-    """
-    p = subprocess.Popen(cmd + " -h", shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    _, se = p.communicate()
-    in_listing = False
-    found = []
-    for line in se.splitlines():
-        print line
-        if line.strip().startswith("-c listno"):
-            in_listing = True
-        elif line.strip().startswith("-t"):
-            in_listing = False
-        elif in_listing:
-            found.append(line.strip())
-
-    if len(found) == 1 and found[0] == "** No ports found **":
-        return []
-    else:
-        #TODO: Parse into something more useful
-        print found
-    return found
-
-
 class Spotread(object):
     """Wrapper for the ArgyllCMS spotread command, which allows reading of
     values from various monitor probes.
@@ -155,6 +155,7 @@ class Spotread(object):
 
 
 if __name__ == '__main__':
+    print list_probes()
     sr = Spotread(
         port = 1,
         lcd = True)
