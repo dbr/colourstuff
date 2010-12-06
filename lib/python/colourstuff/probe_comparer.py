@@ -148,15 +148,6 @@ class ProbeComparer(QtGui.QWidget):
 
         self.last_readings = {}
 
-    """
-    def keyPressEvent(self, event):
-        key = event.key()
-        keys = [getattr(QtCore.Qt, "Key_%d" % x) for x in (1, 2, 3)]
-        if key in keys:
-            number = keys.index(key)+1
-            self.do_sample(number)
-    """
-
     def center(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
         size = self.geometry()
@@ -181,7 +172,6 @@ class ProbeComparer(QtGui.QWidget):
                  3: self.info3}
 
         mappy[patchnum].setText(errstr)
-
 
 
     def do_sample(self):
