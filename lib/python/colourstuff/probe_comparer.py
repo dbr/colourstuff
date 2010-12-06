@@ -149,18 +149,12 @@ class ProbeComparer(QtGui.QWidget):
         print "setting reference"
 
     def set_patches(self, x):
-        colmap = {
-            'White': (255, 255, 255),
-            'Grey': (128, 128, 128),
-            'Black': (0, 0, 0),
-            'Red': (255, 0, 0),
-            'Green': (0, 255, 0),
-            'Blue': (0, 0, 255)}
-
-        for p in [self.patch1, self.patch2, self.patch3]:
-            p.setStyleSheet("QWidget { background-color: rgb(%d, %d, %d) }" % colmap[str(x)])
-            p.show()
-            p.setAutoFillBackground(True)
+        rgb = self.patch_colours[str(x)]
+        rgb = tuple(common.clamp(x*255.0, 0, 255) for x in rgb)
+        for p in self.probe_meta.values():
+            p['patch'].setStyleSheet("QWidget { background-color: rgb(%d, %d, %d) }" % rgb)
+            p['patch'].show()
+            p['patch'].setAutoFillBackground(True)
 
 
 if __name__ == '__main__':
