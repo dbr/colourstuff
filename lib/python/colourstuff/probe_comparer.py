@@ -7,6 +7,7 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 import pyspotread
+import common
 
 
 class ClickableWidget(QtGui.QWidget):
@@ -78,14 +79,14 @@ class ProbeComparer(QtGui.QWidget):
         sample_button = QtGui.QPushButton('Sample', self)
         self.connect(sample_button, QtCore.SIGNAL('clicked()'), self.do_sample)
 
-        self.patch_colours = {
-            "Black": (0, 0, 0),
-            "Grey": (0.5, 0.5, 0.5),
-            "White": (1, 1, 1),
-            "Red": (1, 0, 0),
-            "Green": (0, 1, 0),
-            "Blue": (0, 0, 1),
-        }
+
+        self.patch_colours = common.ODict()
+        self.patch_colours["Black"] = (0, 0, 0)
+        self.patch_colours["Grey"] = (0.5, 0.5, 0.5)
+        self.patch_colours["White"] = (1, 1, 1)
+        self.patch_colours["Red"] = (1, 0, 0)
+        self.patch_colours["Green"] = (0, 1, 0)
+        self.patch_colours["Blue"] = (0, 0, 1)
 
         colour_dropdown = QtGui.QComboBox(self)
         for k in self.patch_colours:
