@@ -42,92 +42,57 @@ class ProbeComparer(QtGui.QWidget):
 
         self.setGeometry(500, 400, 800, 600)
 
-        # Swatches for probes
-        self.patch1 = ClickableWidget(self)
-        self.patch2 = ClickableWidget(self)
-        self.patch3 = ClickableWidget(self)
+        all_patches = QtGui.QHBoxLayout()
+        for probenum in range(2):
+            patch = ClickableWidget(self)
+            patch.setMinimumWidth(300)
+            patch.setMinimumHeight(300)
+            patch.setStyleSheet("QWidget { background-color: rgb(0, 0, 0) }")
+            patch.show()
+            patch.setAutoFillBackground(True)
 
-        self.patch1.setMinimumWidth(300)
-        self.patch2.setMinimumWidth(300)
-        self.patch3.setMinimumWidth(300)
+            self.connect(patch, QtCore.SIGNAL('clicked()'), lambda probenum=probenum:self.set_reference(probenum))
 
-        self.patch1.setMinimumHeight(300)
-        self.patch2.setMinimumHeight(300)
-        self.patch3.setMinimumHeight(300)
+            title = QtGui.QLabel('Probe %d' % probenum)
+            title.setMaximumHeight(25)
 
-        self.patch1.setStyleSheet("QWidget { background-color: rgb(0, 0, 0) }")
-        self.patch2.setStyleSheet("QWidget { background-color: rgb(0, 0, 0) }")
-        self.patch3.setStyleSheet("QWidget { background-color: rgb(0, 0, 0) }")
+            info = QtGui.QTextEdit()
 
-        self.patch1.show()
-        self.patch2.show()
-        self.patch3.show()
-        self.patch1.setAutoFillBackground(True)
-        self.patch2.setAutoFillBackground(True)
-        self.patch3.setAutoFillBackground(True)
+            patch_col = QtGui.QVBoxLayout()
+            patch_col.addWidget(title)
+            patch_col.addWidget(patch)
+            patch_col.addWidget(info)
 
-        self.connect(self.patch1, QtCore.SIGNAL('clicked()'), lambda:self.set_reference(1))
-        self.connect(self.patch2, QtCore.SIGNAL('clicked()'), lambda:self.set_reference(2))
-        self.connect(self.patch3, QtCore.SIGNAL('clicked()'), lambda:self.set_reference(3))
+            all_patches.addLayout(patch_col)
 
 
-        # Titles
-        self.title1 = QtGui.QLabel('Probe 1')
-        self.title2 = QtGui.QLabel('Probe 2')
-        self.title3 = QtGui.QLabel('Probe 3')
+        # Overall sample button
+        sample_button = QtGui.QPushButton('Sample', self)
+        self.connect(sample_button, QtCore.SIGNAL('clicked()'), self.do_sample)
 
-        self.title1.setMaximumHeight(25)
-        self.title2.setMaximumHeight(25)
-        self.title3.setMaximumHeight(25)
+        self.patch_colours = {
+            "Black": (0, 0, 0),
+            "Grey": (0.5, 0.5, 0.5),
+            "White": (1, 1, 1),
+            "Red": (1, 0, 0),
+            "Green": (0, 1, 0),
+            "Blue": (0, 0, 1),
+        }
 
-        self.info1 = QtGui.QTextEdit()
-        self.info2 = QtGui.QTextEdit()
-        self.info3 = QtGui.QTextEdit()
+        colour_dropdown = QtGui.QComboBox(self)
+        for k in self.patch_colours:
+            colour_dropdown.addItem(k)
 
-
-        # Create each column
-        row1 = QtGui.QVBoxLayout()
-        row1.addWidget(self.title1)
-        row1.addWidget(self.patch1)
-        row1.addWidget(self.info1)
-
-        row2 = QtGui.QVBoxLayout()
-        row2.addWidget(self.title2)
-        row2.addWidget(self.patch2)
-        row2.addWidget(self.info2)
-
-        row3 = QtGui.QVBoxLayout()
-        row3.addWidget(self.title3)
-        row3.addWidget(self.patch3)
-        row3.addWidget(self.info3)
-
-
-        # Create columns for each row
-        patch_cols = QtGui.QHBoxLayout()
-        patch_cols.addLayout(row1)
-        patch_cols.addLayout(row2)
-        patch_cols.addLayout(row3)
-
-        self.sample = QtGui.QPushButton('Sample', self)
-        self.connect(self.sample, QtCore.SIGNAL('clicked()'), self.do_sample)
-
-        self.colour = QtGui.QComboBox(self)
-        self.colour.addItem("Black")
-        self.colour.addItem("Grey")
-        self.colour.addItem("White")
-        self.colour.addItem("Red")
-        self.colour.addItem("Green")
-        self.colour.addItem("Blue")
-
-        self.connect(self.colour, QtCore.SIGNAL('currentIndexChanged(const QString&)'), self.set_patches)
+        self.connect(colour_dropdown, QtCore.SIGNAL('currentIndexChanged(const QString&)'), self.set_patches)
 
         button_cols = QtGui.QHBoxLayout()
-        button_cols.addWidget(self.colour)
-        button_cols.addWidget(self.sample)
+        button_cols.addWidget(colour_dropdown)
+        button_cols.addWidget(sample_button)
+
 
         patch_and_button_rows = QtGui.QVBoxLayout()
 
-        patch_and_button_rows.addLayout(patch_cols)
+        patch_and_button_rows.addLayout(all_patches)
         patch_and_button_rows.addLayout(button_cols)
 
         self.setLayout(patch_and_button_rows)
