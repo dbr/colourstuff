@@ -33,8 +33,11 @@ def list_probes(cmd = "spotread"):
         return []
     else:
         import re
-        return dict([re.match("(\d+) = '.*? \((.*)\)'", x).groups() for x in found])
-    return found
+        dictfound = {}
+        for x in found:
+            probenum, probename = re.match("(\d+) = '.*? \((.*)\)'", x).groups()
+            dictfound[int(probenum)] = probename
+        return dictfound
 
 
 class ColourMatrix(object):
