@@ -164,15 +164,4 @@ if __name__ == '__main__':
     sample = sr.sample()
     sr.quit()
 
-    # Convert the XYZ to xyY and a colour-temp
-    X, Y, Z = sample.X, sample.Y, sample.Z
-    x, y, _ = sample.to_xyY()
-    cct = sample.cct()
-
-    def format_float(a):
-        return ("%.04f" % a).rjust(7)
-
-    print "X, Y, Z : %s, %s, %s" % tuple(format_float(a) for a in (X, Y, Z))
-    print "x, y, Y : %s, %s, %s" % tuple(format_float(a) for a in (x, y, Y))
-    print "CCT (K) : %s" % cct
-    print "sRGB    : %s, %s, %s" % tuple(format_float(a) for a in sample.to_srgb())
+    print str(sample)
