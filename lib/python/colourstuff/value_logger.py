@@ -21,6 +21,7 @@ while 1:
         doreading(log)
         time.sleep(5)
     except Exception, e:
-        print "Exiting:"
+        print "Error:"
         print e
+    except KeyboardInterrupt:
         break
