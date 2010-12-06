@@ -39,7 +39,9 @@ class ProbeComparer(QtGui.QWidget):
         self.setWindowTitle('Probe Comparer')
         self.setGeometry(500, 400, 800, 600)
 
-        self.number_probes = 2
+        probe_names = pyspotread.list_probes()
+
+        self.number_probes = len(probe_names)
 
         self.probe_meta = {}
 
@@ -104,8 +106,6 @@ class ProbeComparer(QtGui.QWidget):
         self.setLayout(patch_and_button_rows)
 
         self.center()
-
-        probe_names = pyspotread.list_probes()
 
         self.probes = {}
         for probenum in range(1, self.number_probes+1):
