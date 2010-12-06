@@ -35,11 +35,8 @@ class SamplerThread(QtCore.QThread):
 class ProbeComparer(QtGui.QWidget):
     def __init__(self, parent=None):
         super(ProbeComparer, self).__init__(parent)
-
         QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('cleanlooks'))
-
         self.setWindowTitle('Probe Comparer')
-
         self.setGeometry(500, 400, 800, 600)
 
         self.number_probes = 2
@@ -75,7 +72,7 @@ class ProbeComparer(QtGui.QWidget):
             all_patches.addLayout(patch_col)
 
 
-        # Overall sample button
+        # Patch-colour dropdown and Sample button row
         sample_button = QtGui.QPushButton('Sample', self)
         self.connect(sample_button, QtCore.SIGNAL('clicked()'), self.do_sample)
 
@@ -99,6 +96,7 @@ class ProbeComparer(QtGui.QWidget):
         button_cols.addWidget(sample_button)
 
 
+        # First row is patches, second row is buttons
         patch_and_button_rows = QtGui.QVBoxLayout()
         patch_and_button_rows.addLayout(all_patches)
         patch_and_button_rows.addLayout(button_cols)
