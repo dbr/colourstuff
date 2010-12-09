@@ -81,7 +81,7 @@ class XYZ(object):
     def cct(self):
         return correlated_colour_temp(self.X, self.Y, self.Z)
 
-    def to_Lab(self, refwhite = "D65"):
+    def to_CIELAB(self, refwhite = "D65"):
         """
         http://en.wikipedia.org/wiki/L*a*b*
         """
