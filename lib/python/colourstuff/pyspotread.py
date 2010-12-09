@@ -7,6 +7,7 @@ Requires http://www.argyllcms.com (was developed with version 1.3.2)
 
 import os
 import re
+import math
 import subprocess
 
 import pexpect
@@ -148,6 +149,13 @@ class XYZ(object):
         out_text += "sRGB    : %s, %s, %s" % tuple(format_float(a) for a in (r, g, b))
 
         return out_text
+
+
+def deltaE(a, b):
+    #FIXME: Overly basic and untested
+    L1, a1, b1 = a.to_CIELAB()
+    L2, a2, b2 = b.to_CIELAB()
+    return math.sqrt((L2-L1)**2 + (a2-a1)**2 + (b2-b1)**2)
 
 
 class Spotread(object):

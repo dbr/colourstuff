@@ -134,6 +134,10 @@ class ProbeComparer(QtGui.QWidget):
         self.probe_meta[patchnum]['info'].setText(infostr)
 
         self.last_readings[patchnum] = sample
+        for otherpnum, reading in self.last_readings.items():
+            if otherpnum != patchnum:
+                delta = pyspotread.deltaE(reading, sample)
+                print "delta from %s to %s is... %s" % (patchnum, otherpnum, delta)
 
     def sampler_error(self, patchnum, errstr):
         self.probe_meta[patchnum]['info'].setText(errstr)
