@@ -1,5 +1,4 @@
-"""
-CIE 1931 Standard Colorimetric Observer x2(lambda) data (between 380 nm and 780 nm at 5 nm intervals)
+"""CIE 1931 Standard Colorimetric Observer colour matching functions
 """
 
 def from_txt_to_python(angle = "2"):
@@ -15,9 +14,9 @@ def from_txt_to_python(angle = "2"):
         return mapping
 
     cie1931_standard_observer_2deg = {}
-    cie1931_standard_observer_2deg['x'] = load_txt(open('x%s.txt' % angle))
-    cie1931_standard_observer_2deg['y'] = load_txt(open('y%s.txt' % angle))
-    cie1931_standard_observer_2deg['z'] = load_txt(open('z%s.txt' % angle))
+    cie1931_standard_observer_2deg['x'] = load_txt(open('data/x%s.txt' % angle))
+    cie1931_standard_observer_2deg['y'] = load_txt(open('data/y%s.txt' % angle))
+    cie1931_standard_observer_2deg['z'] = load_txt(open('data/z%s.txt' % angle))
 
 
     print "cie1931_standard_observer_%sdeg = {" % angle
