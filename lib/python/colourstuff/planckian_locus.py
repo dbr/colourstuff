@@ -23,6 +23,38 @@ def planckian_locus_approx(T):
     return (x, y)
 
 
+def plancks_law(wavelen, T):
+    """wavelen is in nanometres, and T is in Kelvin
+
+    $I'(\lambda,T) =\frac{2 hc^2}{\lambda^5}\frac{1}{ e^{\frac{hc}{\lambda kT}}-1}$
+
+    http://en.wikipedia.org/wiki/Planck%27s_law
+    """
+
+    #FIXME: Needs test cases, probably right, but maybe not
+
+    from math import exp, pi
+
+    nm = 10**-9 # nm to metres
+
+    h = 6.6260689633*10**-34 # Planck constant
+    k = 1.380650424*10**-23 # Boltzmann constant
+    c = 299792458 # m/s (speed of light in a vacuum)
+    c = 2.99792*10**8
+
+    # Left-hand chunk of expression (that's the official maths
+    # terminology, I'm sure)
+    p1 = (2*pi*h*(c**2)) / ((wavelen*nm)**5)
+
+    # Right-hand chunk of expression
+    # http://www.wolframalpha.com/input/?i=e^{%5Cfrac{%28Planck+constant%29%28speed+of+light+in+a+vacuum%29}{580nm+*+%28Boltzmann+constant%29+*+5600K}}
+    p2 = 1.0 / (exp((h*c) / (wavelen*nm * k * T)) - 1)
+
+    return p1 * p2
+
+
+plancks_law(580, 5600)
+
 def plotify():
     from pngcanvas import PNGCanvas
     c = PNGCanvas(512, 512)
@@ -66,5 +98,11 @@ def plotify():
     f.write(c.dump())
     f.close()
 
+
 if __name__ == '__main__':
-    plotify()
+    from colour_matching_functions import get_colour_matching_functions
+    X, Y, Z = get_colour_matching_functions(two_degree = True)
+    for wavelen in range(400, 790, 10):
+        print int((((plancks_law(wavelen, 5600) * X(wavelen)) / 1e16) / 7000) * 70) * "*"
+    # for T in range(3000, 25000, 300):
+    #     print (int(plancks_law(580, T) * 10**-13 * 10 + 100) / 60) * "*"
