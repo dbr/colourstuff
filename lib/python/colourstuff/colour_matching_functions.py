@@ -571,9 +571,9 @@ def get_colour_matching_functions(two_degree = False, ten_degree = False):
                 return b*mix + a*(1-mix)
             samples = sorted(data[channel])
             if value < min(samples):
-                raise ValueError("Value below minimum sample: %s" % min(sample))
+                raise ValueError("Value %s below minimum sample: %s" % (value, min(samples)))
             if value > max(samples):
-                raise ValueError("Value above minimum sample: %s" % max(sample))
+                raise ValueError("Value %s above minimum sample: %s" % (value, max(samples)))
 
             deltas = [abs(a - value) for a in samples]
             smallest = deltas.index(min(deltas))
@@ -588,21 +588,23 @@ def get_colour_matching_functions(two_degree = False, ten_degree = False):
 
     return (getfunc("x"), getfunc("y"), getfunc("z"))
 
-x, y, z = get_colour_matching_functions(two_degree = True)
+
+if __name__ == '__main__':
+    x, y, z = get_colour_matching_functions(two_degree = True)
 
 
-xes = [x(i) for i in range(380, 780)]
-yes = [y(i) for i in range(380, 780)]
-zes = [z(i) for i in range(380, 780)]
+    xes = [x(i) for i in range(380, 780)]
+    yes = [y(i) for i in range(380, 780)]
+    zes = [z(i) for i in range(380, 780)]
 
-# Normalise
-xes = [i/max(xes) for i in xes]
-yes = [i/max(yes) for i in yes]
-zes = [i/max(zes) for i in zes]
+    # Normalise
+    xes = [i/max(xes) for i in xes]
+    yes = [i/max(yes) for i in yes]
+    zes = [i/max(zes) for i in zes]
 
-for a in xes:
-    print "*"*int(a*70)
-for a in yes:
-    print "*"*int(a*70)
-for a in zes:
-    print "*"*int(a*70)
+    for a in xes:
+        print "*"*int(a*70)
+    for a in yes:
+        print "*"*int(a*70)
+    for a in zes:
+        print "*"*int(a*70)
