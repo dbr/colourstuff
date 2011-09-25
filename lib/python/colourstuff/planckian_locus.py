@@ -99,10 +99,51 @@ def plotify():
     f.close()
 
 
-if __name__ == '__main__':
+def integrate(f, a, b, N):
+    dx = (b-a)/N
+    s = 0
+    for i in range(N):
+        s += f(a+i*dx)
+    return s * dx
+
+def main():
     from colour_matching_functions import get_colour_matching_functions
     X, Y, Z = get_colour_matching_functions(two_degree = True)
-    for wavelen in range(400, 790, 10):
-        print int((((plancks_law(wavelen, 5600) * X(wavelen)) / 1e16) / 7000) * 70) * "*"
-    # for T in range(3000, 25000, 300):
-    #     print (int(plancks_law(580, T) * 10**-13 * 10 + 100) / 60) * "*"
+
+    samples = 400
+
+    plot_T = []
+    plot_X = []
+    plot_Y = []
+    plot_Z = []
+
+    for T in range(1000, 15000, 100):
+        plot_T.append(T)
+        plot_X.append(integrate(lambda wavelen: plancks_law(wavelen, T) * X(wavelen), 380, 780, samples))
+        plot_Y.append(integrate(lambda wavelen: plancks_law(wavelen, T) * Y(wavelen), 380, 780, samples))
+        plot_Z.append(integrate(lambda wavelen: plancks_law(wavelen, T) * Z(wavelen), 380, 780, samples))
+
+
+    # Nodebox plotting part
+    stroke(0.4)
+    autoclosepath(False)
+    nofill()
+
+    curve_started = False
+
+    for TT, XT, YT, ZT in zip(plot_T, plot_X, plot_Y, plot_Z):
+        # Calculate x,y chromaticity coordinate
+        x = XT / (XT+YT+ZT)
+        y = YT / (XT+YT+ZT)
+
+        if not curve_started:
+            beginpath(x*512, y*512)
+            curve_started = True
+        else:
+            lineto(x*512, y*512)
+
+        print TT, x, y
+
+    endpath()
+
+main()
