@@ -44,6 +44,7 @@ def plancks_law(wavelen, T):
 
     # Left-hand chunk of expression (that's the official maths
     # terminology, I'm sure)
+    # http://www.wolframalpha.com/input/?i=%282*pi*h*c^2%29+%2F+5600nm^2
     p1 = (2*pi*h*(c**2)) / ((wavelen*nm)**5)
 
     # Right-hand chunk of expression
