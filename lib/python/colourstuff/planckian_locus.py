@@ -53,52 +53,6 @@ def plancks_law(wavelen, T):
     return p1 * p2
 
 
-plancks_law(580, 5600)
-
-def plotify():
-    from pngcanvas import PNGCanvas
-    c = PNGCanvas(512, 512)
-
-    def clamp(a, lower, upper):
-        return max(min(a, upper), lower)
-
-    def eightbitify(a):
-        return clamp(int(round(a*255)), lower = 0, upper = 255)
-
-    for xcoord in range(1, 512):
-        for ycoord in range(1,512):
-            x, y = xcoord/511.0, ycoord/511.0
-
-            Y = 0.5
-            X = Y/y * x
-            Z = Y/y * (1-x-y)
-
-            r = X*0.4124564 + Y*0.3575761 + Z*0.1804375
-            g = X*0.2126729 + Y*0.7151522 + Z*0.0721750
-            b = X*0.0193339 + Y*0.1191920 + Z*0.9503041
-
-            r = clamp(r, lower = 0, upper = 1)/sum([r,g,b])
-            g = clamp(g, lower = 0, upper = 1)/sum([r,g,b])
-            b = clamp(b, lower = 0, upper = 1)/sum([r,g,b])
-
-            r = r**(1/2.2)
-            g = g**(1/2.2)
-            b = b**(1/2.2)
-
-            c.point(xcoord, ycoord, color = (eightbitify(r), eightbitify(g), eightbitify(b), 255))
-
-    for T in range(1667, 25000, 10):
-        try:
-            x, y = planckian_locus_approx(T)
-            c.point(int(x*512), int(y*512), color = (0,0,0,255))
-        except ValueError, e:
-            print e
-
-    f = open("planckian_locus_approx.png", "wb")
-    f.write(c.dump())
-    f.close()
-
-
 def integrate(f, a, b, N):
     dx = (b-a)/N
     s = 0
@@ -106,23 +60,54 @@ def integrate(f, a, b, N):
         s += f(a+i*dx)
     return s * dx
 
-def main():
+
+def planckian_locus(T):
+    """Colour of a theoretical incadescent black body radiator at a
+    given temperature, or something like that.
+
+    Can be used to calculate the chromaticity coordinates of, say, a
+    6500K light source
+
+    http://en.wikipedia.org/wiki/Planckian_locus
+
+    Argument T is in Kelvin, return value is a CIE XYZ value
+    """
+    samples = 400
+
     from colour_matching_functions import get_colour_matching_functions
     X, Y, Z = get_colour_matching_functions(two_degree = True)
 
-    samples = 400
+    X_T = integrate(lambda wavelen: plancks_law(wavelen, T) * X(wavelen), 380, 780, samples)
+    Y_T = integrate(lambda wavelen: plancks_law(wavelen, T) * Y(wavelen), 380, 780, samples)
+    Z_T = integrate(lambda wavelen: plancks_law(wavelen, T) * Z(wavelen), 380, 780, samples)
 
-    plot_T = []
-    plot_X = []
-    plot_Y = []
-    plot_Z = []
+    return (X_T, Y_T, Z_T)
 
-    for T in range(1000, 15000, 100):
-        plot_T.append(T)
-        plot_X.append(integrate(lambda wavelen: plancks_law(wavelen, T) * X(wavelen), 380, 780, samples))
-        plot_Y.append(integrate(lambda wavelen: plancks_law(wavelen, T) * Y(wavelen), 380, 780, samples))
-        plot_Z.append(integrate(lambda wavelen: plancks_law(wavelen, T) * Z(wavelen), 380, 780, samples))
 
+def test_plankian_locus_against_approximation():
+    """Test plankian locus non-approximation against approximation
+    """
+    import math
+    for T in range(1667, 25000, 1000):
+        approx_xy = planckian_locus_approx(T)
+        X, Y, Z = planckian_locus(T)
+        x = X / (X+Y+Z)
+        y = Y / (X+Y+Z)
+        calc_xy = x, y
+
+        difference = math.sqrt((approx_xy[0] - calc_xy[0])**2 + (approx_xy[1] - calc_xy[1])**2)
+        assert difference < 0.001, "Difference at %d of %.010f" % (T, difference)
+
+
+def main():
+    print "Checking against approximation"
+    test_plankian_locus_against_approximation()
+    print "..okay"
+
+    plot_values = []
+
+    for T in range(1000, 15000, 1000):
+        plot_values.append([T, planckian_locus(T)])
 
     # Nodebox plotting part
     stroke(0.4)
@@ -131,8 +116,9 @@ def main():
 
     curve_started = False
 
-    for TT, XT, YT, ZT in zip(plot_T, plot_X, plot_Y, plot_Z):
+    for (TT, XYZ) in plot_values:
         # Calculate x,y chromaticity coordinate
+        XT, YT, ZT = XYZ
         x = XT / (XT+YT+ZT)
         y = YT / (XT+YT+ZT)
 
