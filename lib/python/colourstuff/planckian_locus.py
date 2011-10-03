@@ -101,13 +101,53 @@ def test_plankian_locus_against_approximation():
 
 
 def main():
+    #from matplotlib import pyplot
+
+    print "Calculating"
+    from colour_matching_functions import get_colour_matching_functions
+    X, Y, Z = get_colour_matching_functions(two_degree = True)
+    print "Test"
+    wavelens =[x for x in range(380, 780, 1)]
+
+    sampled_x = [X(T) for T in wavelens]
+    #sampled_x = [x/max(sampled_x) for x in sampled_x]
+    #pyplot.plot(sampled_x)
+
+    sampled_y = [Y(T) for T in wavelens]
+    #sampled_y = [x/max(sampled_y) for x in sampled_y]
+    #pyplot.plot(sampled_y)
+
+    sampled_z = [Z(T) for T in wavelens]
+    #sampled_z = [x/max(sampled_z) for x in sampled_z]
+    #pyplot.plot(sampled_z)
+
+    # As explained on http://www.photo-mark.com/notes/2010/sep/08/deconstructing-chromaticity/
+
+    spectral_locus_x = []
+    spectral_locus_y = []
+    for x, y, z in zip(sampled_x, sampled_y, sampled_z):
+        spectral_locus_x.append(
+                x / (x+y+z))
+        spectral_locus_y.append(
+                y / (x+y+z))
+
+    nofill()
+    stroke(0.1, 0.5, 0.8)
+    for x, y in zip(spectral_locus_x, spectral_locus_y):
+        oval(x*512, 512-y*512, 2, 2)
+
+    #pyplot.plot(spectral_locus_x, spectral_locus_y)
+
+    #pyplot.show()
+    #return
+
     print "Checking against approximation"
     test_plankian_locus_against_approximation()
     print "..okay"
 
     plot_values = []
 
-    for T in range(1000, 15000, 1000):
+    for T in range(1000, 15000, 350):
         plot_values.append([T, planckian_locus(T)])
 
     # Nodebox plotting part
@@ -124,10 +164,10 @@ def main():
         y = YT / (XT+YT+ZT)
 
         if not curve_started:
-            beginpath(x*512, y*512)
+            beginpath(x*512, 512-y*512)
             curve_started = True
         else:
-            lineto(x*512, y*512)
+            lineto(x*512, 512-y*512)
 
         print TT, x, y
 
