@@ -35,7 +35,7 @@ def cie1931_standard_observer_rawdata(two_degree = False, ten_degree = False):
     Created using the from_txt_to_python function
     """
 
-    if not two_degree or ten_degree:
+    if not any([two_degree, ten_degree]) or all([two_degree, ten_degree]):
         raise ValueError("Specify either two_degree or ten_degree")
 
     cie1931_standard_observer_2deg = {
