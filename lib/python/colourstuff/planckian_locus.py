@@ -160,7 +160,7 @@ def main():
 
     pyplot.plot(to_plot_x, to_plot_y)
 
-    pyplot.axis(xmin = 0, xmax = 1, ymin = 0, ymax = 1)
+    pyplot.axis(xmin = 0, xmax = 0.8, ymin = 0, ymax = 0.9)
     pyplot.show()
 
     print "Checking against approximation"
