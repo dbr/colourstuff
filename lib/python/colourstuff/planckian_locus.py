@@ -73,11 +73,13 @@ def planckian_locus(T):
 
     Argument T is in Kelvin, return value is a CIE XYZ value
     """
-    samples = 400
+    samples = (780-380)/5 # values every 5 nm are stored
 
     from colour_matching_functions import get_colour_matching_functions
     X, Y, Z = get_colour_matching_functions(two_degree = True)
 
+    # Integrated between 380nm and 780nm, as that is the range of
+    # values contained in the colour-matching functions
     X_T = integrate(lambda wavelen: plancks_law(wavelen, T) * X(wavelen), 380, 780, samples)
     Y_T = integrate(lambda wavelen: plancks_law(wavelen, T) * Y(wavelen), 380, 780, samples)
     Z_T = integrate(lambda wavelen: plancks_law(wavelen, T) * Z(wavelen), 380, 780, samples)
@@ -107,7 +109,7 @@ def main():
     from colour_matching_functions import get_colour_matching_functions
     X, Y, Z = get_colour_matching_functions(two_degree = True)
     print "Test"
-    wavelens =[x for x in range(380, 780, 1)]
+    wavelens =[x for x in range(380, 780, 5)]
 
     sampled_x = [X(T) for T in wavelens]
     #sampled_x = [x/max(sampled_x) for x in sampled_x]
