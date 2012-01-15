@@ -151,6 +151,7 @@ def main():
     to_plot_x, to_plot_y = [], []
     for (TT, XYZ) in T_and_radiance:
         # Calculate x,y chromaticity coordinate
+        # http://en.wikipedia.org/wiki/CIE_1931_color_space#The_CIE_xy_chromaticity_diagram_and_the_CIE_xyY_color_space
         XT, YT, ZT = XYZ
         x = XT / (XT+YT+ZT)
         y = YT / (XT+YT+ZT)
