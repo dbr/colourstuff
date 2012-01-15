@@ -63,8 +63,8 @@ def integrate(f, a, b, N):
 
 
 def planckian_locus(T):
-    """Colour of a theoretical incadescent black body radiator at a
-    given temperature, or something like that.
+    """XYZ colour coordinates of a theoretical incadescent black body
+    radiator at a given temperature, or something like that.
 
     Can be used to calculate the chromaticity coordinates of, say, a
     6500K light source
@@ -103,8 +103,9 @@ def test_plankian_locus_against_approximation():
 
 
 def main():
-    #from matplotlib import pyplot
+    from matplotlib import pyplot
 
+    # Plot CIE XYZ colour matching curves
     print "Calculating"
     from colour_matching_functions import get_colour_matching_functions
     X, Y, Z = get_colour_matching_functions(two_degree = True)
@@ -112,17 +113,21 @@ def main():
     wavelens =[x for x in range(380, 780, 5)]
 
     sampled_x = [X(T) for T in wavelens]
-    #sampled_x = [x/max(sampled_x) for x in sampled_x]
-    #pyplot.plot(sampled_x)
+    sampled_x = [x/max(sampled_x) for x in sampled_x]
+    pyplot.plot(sampled_x)
 
     sampled_y = [Y(T) for T in wavelens]
-    #sampled_y = [x/max(sampled_y) for x in sampled_y]
-    #pyplot.plot(sampled_y)
+    sampled_y = [x/max(sampled_y) for x in sampled_y]
+    pyplot.plot(sampled_y)
 
     sampled_z = [Z(T) for T in wavelens]
-    #sampled_z = [x/max(sampled_z) for x in sampled_z]
-    #pyplot.plot(sampled_z)
+    sampled_z = [x/max(sampled_z) for x in sampled_z]
+    pyplot.plot(sampled_z)
 
+    pyplot.show()
+
+
+    # Plot spectral locus
     # As explained on http://www.photo-mark.com/notes/2010/sep/08/deconstructing-chromaticity/
 
     spectral_locus_x = []
@@ -133,47 +138,33 @@ def main():
         spectral_locus_y.append(
                 y / (x+y+z))
 
-    nofill()
-    stroke(0.1, 0.5, 0.8)
-    for x, y in zip(spectral_locus_x, spectral_locus_y):
-        oval(x*512, 512-y*512, 2, 2)
+    pyplot.plot(spectral_locus_x, spectral_locus_y)
 
-    #pyplot.plot(spectral_locus_x, spectral_locus_y)
 
-    #pyplot.show()
-    #return
-
-    print "Checking against approximation"
-    test_plankian_locus_against_approximation()
-    print "..okay"
-
-    plot_values = []
+    # Also plot Plankian locus
+    T_and_radiance = []
 
     for T in range(1000, 15000, 350):
-        plot_values.append([T, planckian_locus(T)])
+        # Calculate plankian locus
+        T_and_radiance.append([T, planckian_locus(T)])
 
-    # Nodebox plotting part
-    stroke(0.4)
-    autoclosepath(False)
-    nofill()
-
-    curve_started = False
-
-    for (TT, XYZ) in plot_values:
+    to_plot_x, to_plot_y = [], []
+    for (TT, XYZ) in T_and_radiance:
         # Calculate x,y chromaticity coordinate
         XT, YT, ZT = XYZ
         x = XT / (XT+YT+ZT)
         y = YT / (XT+YT+ZT)
+        to_plot_x.append(x)
+        to_plot_y.append(y)
 
-        if not curve_started:
-            beginpath(x*512, 512-y*512)
-            curve_started = True
-        else:
-            lineto(x*512, 512-y*512)
+    pyplot.plot(to_plot_x, to_plot_y)
 
-        print TT, x, y
+    pyplot.axis(xmin = 0, xmax = 1, ymin = 0, ymax = 1)
+    pyplot.show()
 
-    endpath()
+    print "Checking against approximation"
+    test_plankian_locus_against_approximation()
+    print "..okay"
 
 if __name__ == '__main__':
     main()
