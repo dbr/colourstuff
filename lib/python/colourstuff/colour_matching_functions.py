@@ -3,6 +3,10 @@
 
 def from_txt_to_python(angle = "2"):
     """Parses the files from http://www.cie.co.at/main/freepubs.html
+
+    Prints a chunk of copy-and-pastable Python code containing a dict
+    of wavelengths->values, which can be used to implement the
+    colour-matching functions without parsing text files
     """
     def load_txt(f):
         f.readline()
@@ -13,10 +17,18 @@ def from_txt_to_python(angle = "2"):
             mapping[int(wavelen_nm)] = int(value.replace(",", ""))
         return mapping
 
+    def get_data_file(fname):
+        import os
+        data_dir = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "cie1931_data",
+            fname)
+        return data_dir
+
     cie1931_standard_observer_2deg = {}
-    cie1931_standard_observer_2deg['x'] = load_txt(open('data/x%s.txt' % angle))
-    cie1931_standard_observer_2deg['y'] = load_txt(open('data/y%s.txt' % angle))
-    cie1931_standard_observer_2deg['z'] = load_txt(open('data/z%s.txt' % angle))
+    cie1931_standard_observer_2deg['x'] = load_txt(open(get_data_file('x%s.txt' % angle)))
+    cie1931_standard_observer_2deg['y'] = load_txt(open(get_data_file('y%s.txt' % angle)))
+    cie1931_standard_observer_2deg['z'] = load_txt(open(get_data_file('z%s.txt' % angle)))
 
 
     print "cie1931_standard_observer_%sdeg = {" % angle
