@@ -560,15 +560,43 @@ def cie1931_standard_observer_rawdata(two_degree = False, ten_degree = False):
         return cie1931_standard_observer_10deg
 
 
-def get_colour_matching_functions(two_degree = False, ten_degree = False):
+from math import exp
+def analytic_two_degree_x(wave):
+    t1 = (wave-442.0)*((wave<442.0) and 0.0624 or 0.0374)
+    t2 = (wave-599.8)*((wave<599.8) and 0.0264 or 0.0323)
+    t3 = (wave-501.1)*((wave<501.1) and 0.0490 or 0.0382)
+    return 0.362*exp(-0.5*t1*t1) + 1.056*exp(-0.5*t2*t2) - 0.065*exp(-0.5*t3*t3)
+
+def analytic_two_degree_y(wave):
+    t1 = (wave-568.8)*((wave<568.8) and 0.0213 or 0.0247);
+    t2 = (wave-530.9)*((wave<530.9) and 0.0613 or 0.0322);
+    return 0.821*exp(-0.5*t1*t1) + 0.286*exp(-0.5*t2*t2);
+
+def analytic_two_degree_z(wave):
+    t1 = (wave-437.0)*((wave<437.0) and 0.0845 or 0.0278)
+    t2 = (wave-459.0)*((wave<459.0) and 0.0385 or 0.0725)
+    return 1.217*exp(-0.5*t1*t1) + 0.681*exp(-0.5*t2*t2);
+
+
+def get_colour_matching_functions(two_degree = False, ten_degree = False, analytic=False):
     """Get the three colour matching functions, based of the CIE 1931 Standard
     Colorimetric Observer (either the 2 or 10 degree observers)
     
-    Based on the 5nm tabulated data, linearly interpolates between samples.
+    With analytic=False, the functions are based on the 5nm tabulated
+    data, linearly interpolates between samples.
+
+    With analytic=True, the functions use the analytic approximation
+    of the colour matching curves from
+    http://jcgt.org/published/0002/02/01/
     
     Returned as a tuple of three callables, which take a wavelength in
     nanometres, and return the reading.
     """
+
+    if two_degree and analytic:
+        return (analytic_two_degree_x, analytic_two_degree_y, analytic_two_degree_z)
+    elif ten_degree and analytic:
+        raise ValueError("Analytic ten degree curves not implemented")
 
     # Load the raw data
     data = cie1931_standard_observer_rawdata(two_degree = two_degree, ten_degree = ten_degree)
