@@ -79,6 +79,8 @@ kernel void score_matrix_to_rms(
 def setup_opencl(data, cube_size):
     import pycl
 
+    blocking = True
+
     with timeify("Making context, loading kernel"):
         devices = pycl.clGetDeviceIDs()
         ctx = pycl.clCreateContext(devices = devices)
@@ -93,20 +95,21 @@ def setup_opencl(data, cube_size):
     sub_divisions = cube_size**3
 
     with timeify("Creating buffers"):
-        in_r_buf, in_evt1 = pycl.buffer_from_pyarray(queue, data['in_r'], blocking = False)
-        in_g_buf, in_evt2 = pycl.buffer_from_pyarray(queue, data['in_g'], blocking = False)
-        in_b_buf, in_evt3 = pycl.buffer_from_pyarray(queue, data['in_b'], blocking = False)
+        in_r_buf, in_evt1 = pycl.buffer_from_pyarray(queue, data['in_r'], blocking = blocking)
+        in_g_buf, in_evt2 = pycl.buffer_from_pyarray(queue, data['in_g'], blocking = blocking)
+        in_b_buf, in_evt3 = pycl.buffer_from_pyarray(queue, data['in_b'], blocking = blocking)
 
         out_r = data['out_r']
-        out_r_buf, in_evt4 = pycl.buffer_from_pyarray(queue, out_r, blocking = False)
+        out_r_buf, in_evt4 = pycl.buffer_from_pyarray(queue, out_r, blocking = blocking)
 
         score = array.array('f', [0 for x in range(sub_divisions)])
-        score_buf, in_evt5 = pycl.buffer_from_pyarray(queue, score, blocking = False)
+        score_buf, in_evt5 = pycl.buffer_from_pyarray(queue, score, blocking = blocking)
 
 
-    with timeify("Run kernel"):
+    with timeify("Run kernel r"):
         run_evt = score_matrix(
-            in_r_buf, in_g_buf, in_b_buf, out_r_buf, score_buf,
+            #in_r_buf, in_g_buf, in_b_buf, out_r_buf, score_buf,
+            in_r_buf, in_g_buf, in_b_buf, in_r_buf, score_buf,
             len(data['in_r']), cube_size,
             wait_for = [in_evt1, in_evt2, in_evt3, in_evt4, in_evt5]).on(queue,
                                                                          sub_divisions)
